@@ -4,7 +4,7 @@
 function getUser() {
   const params = new URLSearchParams(window.location.search);
   return params.get("user") || "default";
-}
+} 
 
 const USER = getUser();
 const STORAGE_KEY = `culture_events_${USER}`;

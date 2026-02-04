@@ -1,1 +1,48 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Event Marketplace</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+
+  <header class="header">
+    <h1>Browse Events</h1>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="events.html">Browse Events</a>
+      <a href="calendar.html">Calendar</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section id="event-list" class="grid">
+      <!-- Event cards injected here via JS or hardcoded -->
+      
+      <div class="card">
+        <h3>Confetti Trivia Night</h3>
+        <span class="badge self">Self-Serve</span>
+        <p>Team trivia hosted by Confetti</p>
+        <p><strong>Cost:</strong> ~$600</p>
+        <a class="button" href="https://withconfetti.com" target="_blank">
+          Book on Confetti
+        </a>
+      </div>
+
+      <div class="card">
+        <h3>Office Pilates</h3>
+        <span class="badge concierge">Concierge</span>
+        <p>On-site pilates for desk workers</p>
+        <p><strong>Cost:</strong> $800–$1,200</p>
+        <button class="button">Request Coordination</button>
+      </div>
+
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

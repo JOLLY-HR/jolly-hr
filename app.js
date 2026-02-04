@@ -174,12 +174,25 @@ function renderMarketplace() {
     const card = document.createElement("div");
     card.className = "card marketplace-event";
 
+    // Badge text
+    const badgeText = e.type === "self-serve" ? "Self-Serve" : "Concierge";
+
+    // Badge class
+    const badgeClass = e.type === "self-serve" ? "self" : "concierge";
+
+    // Cost display (allow for cost range if provided)
+    const costText = e.costRange || `$${e.cost}`;
+
+    // Description text
+    const descriptionText = e.description || "No description provided.";
+
     card.innerHTML = `
       <h3>${e.name}</h3>
-      <p>Cost: $${e.cost}</p>
-      <p>Type: ${e.type === "self-serve" ? "Book Now" : "Request Concierge"}</p>
-      <button id="book-${i}">
-        ${e.type === "self-serve" ? "Book Now" : "Request Concierge"}
+      <span class="badge ${badgeClass}">${badgeText}</span>
+      <p>${descriptionText}</p>
+      <p><strong>Cost:</strong> ${costText}</p>
+      <button class="button" id="book-${i}">
+        ${e.type === "self-serve" ? "Book Now" : "Request Coordination"}
       </button>
     `;
 
@@ -195,6 +208,7 @@ function renderMarketplace() {
       };
       addEvent(eventToAdd);
       alert(`Event "${e.name}" added to your dashboard!`);
+      updateBudgetDisplay(); // update budget after booking
     });
   });
 }

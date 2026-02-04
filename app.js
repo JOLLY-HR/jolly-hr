@@ -1,6 +1,18 @@
-const STORAGE_KEY = "culture_events";
+/* ======================================
+   --- Get user from URL ---
+   ====================================== */
+function getUser() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("user") || "default";
+}
 
-/* --- Utilities --- */
+const USER = getUser();
+const STORAGE_KEY = `culture_events_${USER}`;
+const BUDGET_KEY = `culture_budget_${USER}`;
+
+/* ======================================
+   --- Get / Save Events ---
+   ====================================== */
 function getEvents() {
   return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 }
@@ -15,7 +27,21 @@ function addEvent(event) {
   saveEvents(events);
 }
 
-/* --- Dashboard population --- */
+/* ======================================
+   --- Get / Save Budget ---
+   ====================================== */
+function getBudget() {
+  const b = localStorage.getItem(BUDGET_KEY);
+  return b ? parseInt(b) : 5000; // default $5,000
+}
+
+function saveBudget(amount) {
+  localStorage.setItem(BUDGET_KEY, amount);
+}
+
+/* ======================================
+   --- Render Dashboard ---
+   ====================================== */
 function renderDashboard() {
   const list = document.getElementById("upcoming-events");
   if (!list) return;
@@ -25,17 +51,20 @@ function renderDashboard() {
 
   if (events.length === 0) {
     list.innerHTML = "<li>No events scheduled yet.</li>";
-    return;
+  } else {
+    events.forEach(e => {
+      const li = document.createElement("li");
+      li.textContent = `${e.date || "TBD"} – ${e.name} – ${e.status}`;
+      list.appendChild(li);
+    });
   }
 
-  events.forEach(e => {
-    const li = document.createElement("li");
-    li.textContent = `${e.date || "TBD"} – ${e.name} – ${e.status}`;
-    list.appendChild(li);
-  });
+  updateBudgetDisplay();
 }
 
-/* --- Calendar population --- */
+/* ======================================
+   --- Render Calendar ---
+   ====================================== */
 function renderCalendar() {
   const list = document.getElementById("calendar-events");
   if (!list) return;
@@ -50,7 +79,40 @@ function renderCalendar() {
   });
 }
 
-/* --- Demo helpers (optional buttons) --- */
+/* ======================================
+   --- Update Budget Display ---
+   ====================================== */
+const budgetInput = document.getElementById("budget-input");
+const budgetRemaining = document.getElementById("budget-remaining");
+
+function updateBudgetDisplay() {
+  const total = getBudget();
+  const events = getEvents();
+  const spent = events.reduce((sum, e) => sum + (e.cost || 0), 0);
+  const remaining = total - spent;
+
+  if (budgetRemaining) {
+    budgetRemaining.innerHTML = `<strong>Remaining:</strong> $${remaining}`;
+  }
+
+  if (budgetInput) {
+    budgetInput.value = total;
+  }
+}
+
+/* --- Budget Input Event Listener --- */
+if (budgetInput) {
+  budgetInput.addEventListener("change", (e) => {
+    let val = parseInt(e.target.value);
+    if (isNaN(val) || val < 0) val = 0;
+    saveBudget(val);
+    updateBudgetDisplay();
+  });
+}
+
+/* ======================================
+   --- Demo Helpers (Optional Buttons) ---
+   ====================================== */
 function bookSelfServeDemo() {
   addEvent({
     name: "Confetti Trivia Night",
@@ -58,7 +120,8 @@ function bookSelfServeDemo() {
     cost: 600,
     status: "🟢 Confirmed"
   });
-  window.location.href = "index.html";
+  renderDashboard();
+  renderCalendar();
 }
 
 function requestConciergeDemo() {
@@ -68,9 +131,21 @@ function requestConciergeDemo() {
     cost: 900,
     status: "🟡 Coordinating"
   });
-  window.location.href = "index.html";
+  renderDashboard();
+  renderCalendar();
 }
 
-/* --- Init --- */
+/* ======================================
+   --- Prefill Demo Events If None Exist ---
+   ====================================== */
+if (!getEvents().length) {
+  addEvent({ name: "Confetti Trivia Night", date: "Feb 20", cost: 600, status: "🟢 Confirmed" });
+  addEvent({ name: "Office Pilates", date: "TBD", cost: 900, status: "🟡 Coordinating" });
+}
+
+/* ======================================
+   --- Init: Render Everything ---
+   ====================================== */
 renderDashboard();
 renderCalendar();
+updateBudgetDisplay();

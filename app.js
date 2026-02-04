@@ -1,4 +1,15 @@
 /* ======================================
+   --- Marketplace Events (Demo) ---
+   ====================================== */
+const MARKETPLACE_EVENTS = [
+  { name: "Confetti Trivia Night", cost: 600, type: "self-serve" },
+  { name: "Office Pilates", cost: 900, type: "concierge" },
+  { name: "Team Happy Hour", cost: 400, type: "self-serve" },
+  { name: "Cooking Class", cost: 1200, type: "concierge" }
+];
+
+
+/* ======================================
    --- Get user from URL ---
    ====================================== */
 function getUser() {
@@ -149,3 +160,47 @@ if (!getEvents().length) {
 renderDashboard();
 renderCalendar();
 updateBudgetDisplay();
+
+/* ======================================
+   --- Render Marketplace ---
+   ====================================== */
+function renderMarketplace() {
+  const container = document.getElementById("events-list");
+  if (!container) return;
+
+  container.innerHTML = ""; // clear
+
+  MARKETPLACE_EVENTS.forEach((e, i) => {
+    const card = document.createElement("div");
+    card.className = "card marketplace-event";
+
+    card.innerHTML = `
+      <h3>${e.name}</h3>
+      <p>Cost: $${e.cost}</p>
+      <p>Type: ${e.type === "self-serve" ? "Book Now" : "Request Concierge"}</p>
+      <button id="book-${i}">
+        ${e.type === "self-serve" ? "Book Now" : "Request Concierge"}
+      </button>
+    `;
+
+    container.appendChild(card);
+
+    // Attach click handler
+    document.getElementById(`book-${i}`).addEventListener("click", () => {
+      const eventToAdd = {
+        name: e.name,
+        date: e.date || "TBD",
+        cost: e.cost,
+        status: e.type === "self-serve" ? "🟢 Confirmed" : "🟡 Coordinating"
+      };
+      addEvent(eventToAdd);
+      alert(`Event "${e.name}" added to your dashboard!`);
+    });
+  });
+}
+
+/* Call this only if events-list exists */
+if (document.getElementById("events-list")) {
+  renderMarketplace();
+}
+

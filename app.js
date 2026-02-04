@@ -40,6 +40,37 @@ function saveBudget(amount) {
 }
 
 /* ======================================
+   --- Budget Input Handling ---
+   ====================================== */
+const budgetInput = document.getElementById("budget-input");
+const budgetRemaining = document.getElementById("budget-remaining");
+
+function updateBudgetDisplay() {
+  const total = getBudget();
+  const events = getEvents();
+  const spent = events.reduce((sum, e) => sum + (e.cost || 0), 0);
+  const remaining = total - spent;
+
+  if (budgetRemaining) {
+    budgetRemaining.innerHTML = `<strong>Remaining:</strong> $${remaining}`;
+  }
+
+  if (budgetInput) {
+    budgetInput.value = total;
+  }
+}
+
+/* Save new budget when user changes input */
+if (budgetInput) {
+  budgetInput.addEventListener("change", (e) => {
+    let val = parseInt(e.target.value);
+    if (isNaN(val) || val < 0) val = 0;
+    saveBudget(val);
+    updateBudgetDisplay();
+  });
+}
+
+/* ======================================
    --- Render Dashboard ---
    ====================================== */
 function renderDashboard() {
@@ -76,37 +107,6 @@ function renderCalendar() {
     const li = document.createElement("li");
     li.textContent = `${e.date || "TBD"} – ${e.name} – ${e.status}`;
     list.appendChild(li);
-  });
-}
-
-/* ======================================
-   --- Update Budget Display ---
-   ====================================== */
-const budgetInput = document.getElementById("budget-input");
-const budgetRemaining = document.getElementById("budget-remaining");
-
-function updateBudgetDisplay() {
-  const total = getBudget();
-  const events = getEvents();
-  const spent = events.reduce((sum, e) => sum + (e.cost || 0), 0);
-  const remaining = total - spent;
-
-  if (budgetRemaining) {
-    budgetRemaining.innerHTML = `<strong>Remaining:</strong> $${remaining}`;
-  }
-
-  if (budgetInput) {
-    budgetInput.value = total;
-  }
-}
-
-/* --- Budget Input Event Listener --- */
-if (budgetInput) {
-  budgetInput.addEventListener("change", (e) => {
-    let val = parseInt(e.target.value);
-    if (isNaN(val) || val < 0) val = 0;
-    saveBudget(val);
-    updateBudgetDisplay();
   });
 }
 

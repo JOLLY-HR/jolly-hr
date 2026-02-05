@@ -1,45 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Culture Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="assets/styles.css" />
+  <meta charset="UTF-8">
+  <title>Employee Culture Dashboard</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="app.js" defer></script>
 </head>
 <body>
-
-  <header class="header">
-    <h1>Company Culture Dashboard</h1>
+  <header>
+    <h1>Employee Culture Dashboard</h1>
     <nav>
-      <a href="index.html">Dashboard</a>
-      <a href="events.html">Browse Events</a>
-      <a href="calendar.html">Calendar</a>
+      <a href="#budget-card" class="nav-link">Budget</a>
+      <a href="#events-list" class="nav-link">Browse Events</a>
+      <a href="#calendar-events" class="nav-link">Calendar</a>
     </nav>
   </header>
 
   <main class="container">
- <section class="card" id="budget-card">
-  <h2>Monthly Budget</h2>
-  <label for="budget-input">Set your monthly budget ($):</label>
-  <input type="number" id="budget-input" min="0" step="100" />
-  <p id="budget-remaining"><strong>Remaining:</strong> $0</p>
-</section>
 
+    <!-- ====== Budget Section ====== -->
+    <section id="budget-card" class="card">
+      <h2>Monthly Budget</h2>
+      <label for="budget-input">Set your monthly budget ($):</label>
+      <input type="number" id="budget-input" min="0" step="100">
+      <p id="budget-remaining"><strong>Remaining:</strong> $0</p>
+    </section>
 
-    <section class="card">
+    <!-- ====== Events Marketplace ====== -->
+    <section id="events-list">
+      <h2>Events Marketplace</h2>
+      <!-- Event cards dynamically injected here -->
+    </section>
+
+    <!-- ====== Calendar / Dashboard ====== -->
+    <section id="calendar-events" class="card">
       <h2>Upcoming Events</h2>
       <ul id="upcoming-events">
-        <li>No events scheduled yet.</li>
+        <!-- Dashboard events dynamically injected here -->
       </ul>
     </section>
 
-    <section class="actions">
-      <a class="button" href="events.html">Browse Events</a>
-      <button class="button secondary">Request Concierge Event</button>
-    </section>
   </main>
-
-  <script src="app.js"></script>
 </body>
 </html>
-

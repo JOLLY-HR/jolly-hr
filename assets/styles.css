@@ -1,4 +1,6 @@
-/* ========== Global & Layout ========== */
+/* ======================================
+   Global Styles
+   ====================================== */
 body {
   font-family: 'Helvetica Neue', Arial, sans-serif;
   margin: 0;
@@ -16,10 +18,16 @@ header {
   align-items: center;
 }
 
-header a {
+nav a {
   color: #fff;
   margin-left: 1rem;
   text-decoration: none;
+}
+
+nav a.active {
+  font-weight: bold;
+  color: #2196f3;
+  text-decoration: underline;
 }
 
 .container {
@@ -28,7 +36,7 @@ header a {
   padding: 0 1rem;
 }
 
-/* ========== Cards ========== */
+/* Cards */
 .card {
   background: #fff;
   border-radius: 10px;
@@ -37,10 +45,7 @@ header a {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.card h3 {
-  margin-top: 0;
-}
-
+/* Badges */
 .badge {
   display: inline-block;
   padding: 0.2rem 0.6rem;
@@ -60,6 +65,7 @@ header a {
   color: #fff;
 }
 
+/* Buttons */
 .button {
   display: inline-block;
   padding: 0.5rem 1rem;
@@ -72,22 +78,33 @@ header a {
   margin-top: 0.5rem;
 }
 
-.button:hover {
+.button:hover:not(:disabled) {
   background: #1976d2;
 }
 
-/* ========== Grid for Marketplace ========== */
+.button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  color: #666;
+}
+
+/* Grid for Marketplace */
 #events-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1rem;
 }
 
-/* ========== Budget Card ========== */
+/* Budget input */
 #budget-card input {
   width: 100%;
   padding: 0.5rem;
   margin-top: 0.3rem;
   border-radius: 5px;
   border: 1px solid #ccc;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }

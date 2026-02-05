@@ -1,22 +1,10 @@
 /* ======================================
-   --- Marketplace Events (Demo) ---
-   ====================================== */
-const MARKETPLACE_EVENTS = [
-  { name: "Confetti Trivia Night", cost: 600, type: "self-serve" },
-  { name: "Office Pilates", cost: 900, type: "concierge" },
-  { name: "Team Happy Hour", cost: 400, type: "self-serve" },
-  { name: "Cooking Class", cost: 1200, type: "concierge" }
-];
-
-
-/* ======================================
-   --- Get user from URL ---
+   --- Get User from URL ---
    ====================================== */
 function getUser() {
   const params = new URLSearchParams(window.location.search);
   return params.get("user") || "default";
-} 
-
+}
 const USER = getUser();
 const STORAGE_KEY = `culture_events_${USER}`;
 const BUDGET_KEY = `culture_budget_${USER}`;
@@ -36,6 +24,9 @@ function addEvent(event) {
   const events = getEvents();
   events.push(event);
   saveEvents(events);
+  renderDashboard();
+  renderCalendar();
+  renderMarketplace();
 }
 
 /* ======================================
@@ -43,7 +34,7 @@ function addEvent(event) {
    ====================================== */
 function getBudget() {
   const b = localStorage.getItem(BUDGET_KEY);
-  return b ? parseInt(b) : 5000; // default $5,000
+  return b ? parseInt(b) : 5000;
 }
 
 function saveBudget(amount) {
@@ -58,8 +49,7 @@ const budgetRemaining = document.getElementById("budget-remaining");
 
 function updateBudgetDisplay() {
   const total = getBudget();
-  const events = getEvents();
-  const spent = events.reduce((sum, e) => sum + (e.cost || 0), 0);
+  const spent = getEvents().reduce((sum, e) => sum + (e.cost || 0), 0);
   const remaining = total - spent;
 
   if (budgetRemaining) {
@@ -71,18 +61,18 @@ function updateBudgetDisplay() {
   }
 }
 
-/* Save new budget when user changes input */
 if (budgetInput) {
   budgetInput.addEventListener("change", (e) => {
     let val = parseInt(e.target.value);
     if (isNaN(val) || val < 0) val = 0;
     saveBudget(val);
     updateBudgetDisplay();
+    renderMarketplace();
   });
 }
 
 /* ======================================
-   --- Render Dashboard ---
+   --- Dashboard / Calendar ---
    ====================================== */
 function renderDashboard() {
   const list = document.getElementById("upcoming-events");
@@ -96,7 +86,7 @@ function renderDashboard() {
   } else {
     events.forEach(e => {
       const li = document.createElement("li");
-      li.textContent = `${e.date || "TBD"} – ${e.name} – ${e.status}`;
+      li.textContent = `${e.date || "TBD"} – ${e.name} – ${e.status} ($${e.cost})`;
       list.appendChild(li);
     });
   }
@@ -104,62 +94,64 @@ function renderDashboard() {
   updateBudgetDisplay();
 }
 
-/* ======================================
-   --- Render Calendar ---
-   ====================================== */
 function renderCalendar() {
-  const list = document.getElementById("calendar-events");
-  if (!list) return;
-
-  const events = getEvents();
-  list.innerHTML = "";
-
-  events.forEach(e => {
-    const li = document.createElement("li");
-    li.textContent = `${e.date || "TBD"} – ${e.name} – ${e.status}`;
-    list.appendChild(li);
-  });
+  renderDashboard(); // For MVP, calendar duplicates dashboard
 }
 
 /* ======================================
-   --- Demo Helpers (Optional Buttons) ---
+   --- Marketplace Events (Demo) ---
    ====================================== */
-function bookSelfServeDemo() {
-  addEvent({
+const MARKETPLACE_EVENTS = [
+  {
     name: "Confetti Trivia Night",
-    date: "Feb 20",
+    type: "self-serve",
     cost: 600,
-    status: "🟢 Confirmed"
-  });
-  renderDashboard();
-  renderCalendar();
-}
-
-function requestConciergeDemo() {
-  addEvent({
+    costRange: "$600",
+    description: "Team trivia hosted by Confetti. Fun questions and virtual prizes!"
+  },
+  {
     name: "Office Pilates",
-    date: "TBD",
+    type: "concierge",
     cost: 900,
-    status: "🟡 Coordinating"
-  });
-  renderDashboard();
-  renderCalendar();
-}
-
-/* ======================================
-   --- Prefill Demo Events If None Exist ---
-   ====================================== */
-if (!getEvents().length) {
-  addEvent({ name: "Confetti Trivia Night", date: "Feb 20", cost: 600, status: "🟢 Confirmed" });
-  addEvent({ name: "Office Pilates", date: "TBD", cost: 900, status: "🟡 Coordinating" });
-}
-
-/* ======================================
-   --- Init: Render Everything ---
-   ====================================== */
-renderDashboard();
-renderCalendar();
-updateBudgetDisplay();
+    costRange: "$800–$1,200",
+    description: "On-site pilates for desk workers. Instructor visits your office."
+  },
+  {
+    name: "Team Happy Hour",
+    type: "self-serve",
+    cost: 400,
+    costRange: "$400",
+    description: "Casual team happy hour to unwind and build camaraderie."
+  },
+  {
+    name: "Cooking Class",
+    type: "concierge",
+    cost: 1200,
+    costRange: "$1,200–$1,500",
+    description: "Private cooking session for employees to learn new recipes."
+  },
+  {
+    name: "Escape Room Challenge",
+    type: "concierge",
+    cost: 1500,
+    costRange: "$1,500–$2,000",
+    description: "Team-building escape room experience."
+  },
+  {
+    name: "Meditation Workshop",
+    type: "self-serve",
+    cost: 300,
+    costRange: "$300",
+    description: "Guided mindfulness and meditation session."
+  },
+  {
+    name: "Office Yoga",
+    type: "concierge",
+    cost: 800,
+    costRange: "$800–$1,000",
+    description: "In-person yoga class to improve posture and relieve tension."
+  }
+];
 
 /* ======================================
    --- Render Marketplace ---
@@ -170,51 +162,68 @@ function renderMarketplace() {
 
   container.innerHTML = ""; // clear
 
+  const remainingBudget = getBudget() - getEvents().reduce((sum, e) => sum + (e.cost || 0), 0);
+
   MARKETPLACE_EVENTS.forEach((e, i) => {
     const card = document.createElement("div");
     card.className = "card marketplace-event";
 
-    // Badge text
     const badgeText = e.type === "self-serve" ? "Self-Serve" : "Concierge";
-
-    // Badge class
     const badgeClass = e.type === "self-serve" ? "self" : "concierge";
-
-    // Cost display (allow for cost range if provided)
     const costText = e.costRange || `$${e.cost}`;
-
-    // Description text
     const descriptionText = e.description || "No description provided.";
+
+    const canBook = e.cost <= remainingBudget;
 
     card.innerHTML = `
       <h3>${e.name}</h3>
       <span class="badge ${badgeClass}">${badgeText}</span>
       <p>${descriptionText}</p>
       <p><strong>Cost:</strong> ${costText}</p>
-      <button class="button" id="book-${i}">
-        ${e.type === "self-serve" ? "Book Now" : "Request Coordination"}
+      <button class="button" id="book-${i}" ${!canBook ? "disabled" : ""}>
+        ${canBook ? (e.type === "self-serve" ? "Book Now" : "Request Coordination") : "Over Budget"}
       </button>
     `;
 
     container.appendChild(card);
 
-    // Attach click handler
-    document.getElementById(`book-${i}`).addEventListener("click", () => {
-      const eventToAdd = {
-        name: e.name,
-        date: e.date || "TBD",
-        cost: e.cost,
-        status: e.type === "self-serve" ? "🟢 Confirmed" : "🟡 Coordinating"
-      };
-      addEvent(eventToAdd);
-      alert(`Event "${e.name}" added to your dashboard!`);
-      updateBudgetDisplay(); // update budget after booking
-    });
+    if (canBook) {
+      document.getElementById(`book-${i}`).addEventListener("click", () => {
+        const eventToAdd = {
+          name: e.name,
+          date: e.date || "TBD",
+          cost: e.cost,
+          status: e.type === "self-serve" ? "🟢 Confirmed" : "🟡 Coordinating"
+        };
+        addEvent(eventToAdd);
+        alert(`Event "${e.name}" added to your dashboard!`);
+      });
+    }
   });
 }
 
-/* Call this only if events-list exists */
-if (document.getElementById("events-list")) {
-  renderMarketplace();
+/* ======================================
+   --- Smooth Scrolling & Active Nav ---
+   ====================================== */
+const sections = document.querySelectorAll("section");
+const navLinks = document.querySelectorAll(".nav-link");
+
+function setActiveLink() {
+  let index = sections.length;
+
+  while(--index && window.scrollY + 100 < sections[index].offsetTop) {}
+
+  navLinks.forEach(link => link.classList.remove("active"));
+  if(navLinks[index]) navLinks[index].classList.add("active");
 }
 
+window.addEventListener("scroll", setActiveLink);
+
+/* ======================================
+   --- Init ---
+   ====================================== */
+renderDashboard();
+renderCalendar();
+renderMarketplace();
+updateBudgetDisplay();
+setActiveLink();
